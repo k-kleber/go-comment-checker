@@ -476,6 +476,7 @@ func applyFilterChain(comments []models.CommentInfo) []models.CommentInfo {
 	bddFilter := filters.NewBDDFilter()
 	directiveFilter := filters.NewDirectiveFilter()
 	shebangFilter := filters.NewShebangFilter()
+	rationaleFilter := filters.NewRationaleFilter()
 
 	var filtered []models.CommentInfo
 	for _, c := range comments {
@@ -486,6 +487,9 @@ func applyFilterChain(comments []models.CommentInfo) []models.CommentInfo {
 			continue
 		}
 		if shebangFilter.ShouldSkip(c) {
+			continue
+		}
+		if rationaleFilter.ShouldSkip(c) {
 			continue
 		}
 		filtered = append(filtered, c)
@@ -508,6 +512,81 @@ print("hello")`
 	// then
 	assert.Len(t, filtered, 1)
 	assert.True(t, agentMemoFilter.IsAgentMemo(filtered[0]))
+}
+
+func Test_FullPipeline_WithRationaleComment_FiltersOutBecause(t *testing.T) {
+	// given
+	detector := core.NewCommentDetector()
+	code := `// using backoff because downstream retries can cascade failures
+func main() {}`
+
+	// when
+	comments := detector.Detect(code, "main.go", false)
+	filtered := applyFilterChain(comments)
+
+	// then
+	assert.NotEmpty(t, comments)
+	assert.Empty(t, filtered, "rationale comment should be filtered out")
+}
+
+func Test_FullPipeline_WithRationaleComment_FiltersOutIssueReference(t *testing.T) {
+	// given
+	detector := core.NewCommentDetector()
+	code := `// workaround for parser limitation, see issue #847
+func main() {}`
+
+	// when
+	comments := detector.Detect(code, "main.go", false)
+	filtered := applyFilterChain(comments)
+
+	// then
+	assert.NotEmpty(t, comments)
+	assert.Empty(t, filtered, "issue-linked rationale comment should be filtered out")
+}
+
+func Test_FullPipeline_WithRationaleComment_FiltersOutImportantConstraint(t *testing.T) {
+	// given
+	detector := core.NewCommentDetector()
+	code := `// IMPORTANT: this is needed to avoid double-processing under external constraints
+func main() {}`
+
+	// when
+	comments := detector.Detect(code, "main.go", false)
+	filtered := applyFilterChain(comments)
+
+	// then
+	assert.NotEmpty(t, comments)
+	assert.Empty(t, filtered, "constraint rationale comment should be filtered out")
+}
+
+func Test_FullPipeline_WithNarrationComment_StillFlaggedIncrement(t *testing.T) {
+	// given
+	detector := core.NewCommentDetector()
+	code := `// increment i
+func main() {}`
+
+	// when
+	comments := detector.Detect(code, "main.go", false)
+	filtered := applyFilterChain(comments)
+
+	// then
+	assert.NotEmpty(t, comments)
+	assert.Len(t, filtered, 1, "narration comment should remain a violation")
+}
+
+func Test_FullPipeline_WithNarrationComment_StillFlaggedReturn(t *testing.T) {
+	// given
+	detector := core.NewCommentDetector()
+	code := `// return result
+func main() {}`
+
+	// when
+	comments := detector.Detect(code, "main.go", false)
+	filtered := applyFilterChain(comments)
+
+	// then
+	assert.NotEmpty(t, comments)
+	assert.Len(t, filtered, 1, "narration comment should remain a violation")
 }
 
 func Test_FullPipeline_WithAgentMemo_FormatterIncludesWarning(t *testing.T) {

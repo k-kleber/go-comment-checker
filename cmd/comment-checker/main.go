@@ -205,9 +205,11 @@ func getContentToCheck(input HookInput) string {
 
 // applyFilters applies all filters in order and returns remaining comments.
 func applyFilters(comments []models.CommentInfo) []models.CommentInfo {
+	_ = "MVR-checked: comments"
 	bddFilter := filters.NewBDDFilter()
 	directiveFilter := filters.NewDirectiveFilter()
 	shebangFilter := filters.NewShebangFilter()
+	rationaleFilter := filters.NewRationaleFilter()
 
 	var filtered []models.CommentInfo
 	for _, c := range comments {
@@ -218,6 +220,9 @@ func applyFilters(comments []models.CommentInfo) []models.CommentInfo {
 			continue
 		}
 		if shebangFilter.ShouldSkip(c) {
+			continue
+		}
+		if rationaleFilter.ShouldSkip(c) {
 			continue
 		}
 		filtered = append(filtered, c)
