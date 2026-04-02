@@ -1,5 +1,6 @@
 # Build artifacts
-comment-checker
+/comment-checker
+/comment-checker.exe
 *.exe
 
 # IDE
