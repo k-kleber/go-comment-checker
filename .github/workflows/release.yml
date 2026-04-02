@@ -114,20 +114,20 @@ jobs:
 
             ### npm (Recommended)
             ```bash
-            npm install -g @code-yeongyu/comment-checker
+            npm install -g @k-kleber/comment-checker
             # or
-            bun add -g @code-yeongyu/comment-checker
+            bun add -g @k-kleber/comment-checker
             ```
 
             ### Homebrew (macOS)
             ```bash
-            brew tap code-yeongyu/tap
+            brew tap k-kleber/tap
             brew install comment-checker
             ```
 
             ### Go Install
             ```bash
-            go install github.com/code-yeongyu/go-claude-code-comment-checker/cmd/comment-checker@latest
+            go install github.com/k-kleber/go-comment-checker/cmd/comment-checker@latest
             ```
 
             ### Manual Download
@@ -176,16 +176,16 @@ jobs:
           cat > formula.rb << 'EOF'
           class CommentChecker < Formula
             desc "Multi-language comment detection hook for Claude Code. 100% vibe coded."
-            homepage "https://github.com/code-yeongyu/go-claude-code-comment-checker"
+            homepage "https://github.com/k-kleber/go-comment-checker"
             version "VERSION_PLACEHOLDER"
             license "MIT"
 
             on_macos do
               if Hardware::CPU.arm?
-                url "https://github.com/code-yeongyu/go-claude-code-comment-checker/releases/download/vVERSION_PLACEHOLDER/comment-checker_vVERSION_PLACEHOLDER_darwin_arm64.tar.gz"
+                url "https://github.com/k-kleber/go-comment-checker/releases/download/vVERSION_PLACEHOLDER/comment-checker_vVERSION_PLACEHOLDER_darwin_arm64.tar.gz"
                 sha256 "ARM64_SHA_PLACEHOLDER"
               else
-                url "https://github.com/code-yeongyu/go-claude-code-comment-checker/releases/download/vVERSION_PLACEHOLDER/comment-checker_vVERSION_PLACEHOLDER_darwin_amd64.tar.gz"
+                url "https://github.com/k-kleber/go-comment-checker/releases/download/vVERSION_PLACEHOLDER/comment-checker_vVERSION_PLACEHOLDER_darwin_amd64.tar.gz"
                 sha256 "AMD64_SHA_PLACEHOLDER"
               end
             end
@@ -204,7 +204,7 @@ jobs:
           sed -i "s/ARM64_SHA_PLACEHOLDER/${{ steps.checksums.outputs.arm64_sha }}/g" formula.rb
           sed -i "s/AMD64_SHA_PLACEHOLDER/${{ steps.checksums.outputs.amd64_sha }}/g" formula.rb
           
-          git clone https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/code-yeongyu/homebrew-tap.git
+          git clone https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/k-kleber/homebrew-tap.git
           mkdir -p homebrew-tap/Formula
           cp formula.rb homebrew-tap/Formula/comment-checker.rb
           cd homebrew-tap

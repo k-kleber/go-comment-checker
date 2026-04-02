@@ -24,7 +24,7 @@ exceptions exist. BDD comments (`# given`, `# when`, `# then`), linter directive
 ### homebrew (macos/linux)
 
 ```bash
-brew tap code-yeongyu/tap
+brew tap k-kleber/tap
 brew install comment-checker
 ```
 

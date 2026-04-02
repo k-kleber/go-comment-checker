@@ -22,7 +22,7 @@ BDD 테스트 주석, 린터 지시문, shebang은 허용합니다.
 ### Homebrew (macOS/Linux)
 
 ```sh
-brew tap code-yeongyu/tap
+brew tap k-kleber/tap
 brew install comment-checker
 ```
 
