@@ -152,7 +152,7 @@ func run(cmd *cobra.Command, args []string) {
 			os.Exit(exitPass)
 			return
 		}
-		comments = detector.Detect(content, filePath, true)
+		comments = detector.Detect(content, filePath)
 	}
 
 	// No comments found
@@ -210,6 +210,7 @@ func applyFilters(comments []models.CommentInfo) []models.CommentInfo {
 	directiveFilter := filters.NewDirectiveFilter()
 	shebangFilter := filters.NewShebangFilter()
 	rationaleFilter := filters.NewRationaleFilter()
+	docstringFilter := filters.NewDocstringFilter()
 
 	var filtered []models.CommentInfo
 	for _, c := range comments {
@@ -223,6 +224,9 @@ func applyFilters(comments []models.CommentInfo) []models.CommentInfo {
 			continue
 		}
 		if rationaleFilter.ShouldSkip(c) {
+			continue
+		}
+		if docstringFilter.ShouldSkip(c) {
 			continue
 		}
 		filtered = append(filtered, c)
@@ -259,8 +263,8 @@ func filterNewComments(oldComments, newComments []models.CommentInfo) []models.C
 
 // detectNewCommentsForEdit detects comments that are newly added in Edit operation.
 func detectNewCommentsForEdit(detector *core.CommentDetector, oldString, newString, filePath string) []models.CommentInfo {
-	oldComments := detector.Detect(oldString, filePath, true)
-	newComments := detector.Detect(newString, filePath, true)
+	oldComments := detector.Detect(oldString, filePath)
+	newComments := detector.Detect(newString, filePath)
 
 	return filterNewComments(oldComments, newComments)
 }

@@ -3,8 +3,8 @@ package core
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/k-kleber/go-comment-checker/pkg/models"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_Detect_PythonLineComment_ReturnsCommentInfo(t *testing.T) {
@@ -13,7 +13,7 @@ func Test_Detect_PythonLineComment_ReturnsCommentInfo(t *testing.T) {
 	code := "# This is a comment\nprint('hello')"
 
 	// when
-	comments := detector.Detect(code, "test.py", false)
+	comments := detector.Detect(code, "test.py")
 
 	// then
 	assert.Len(t, comments, 1)
@@ -31,7 +31,7 @@ func Test_Detect_TypeScriptBlockComment_ReturnsCommentInfo(t *testing.T) {
 const x = 1;`
 
 	// when
-	comments := detector.Detect(code, "test.ts", false)
+	comments := detector.Detect(code, "test.ts")
 
 	// then
 	assert.Len(t, comments, 1)
@@ -50,7 +50,7 @@ def hello():
     pass`
 
 	// when
-	comments := detector.Detect(code, "module.py", true)
+	comments := detector.Detect(code, "module.py")
 
 	// then
 	assert.NotEmpty(t, comments)
@@ -73,7 +73,7 @@ func Test_Detect_UnsupportedExtension_ReturnsEmptyList(t *testing.T) {
 	code := "some random content"
 
 	// when
-	comments := detector.Detect(code, "test.xyz", false)
+	comments := detector.Detect(code, "test.xyz")
 
 	// then
 	assert.Empty(t, comments)
@@ -88,7 +88,7 @@ package main
 func main() {}`
 
 	// when
-	comments := detector.Detect(code, "main.go", false)
+	comments := detector.Detect(code, "main.go")
 
 	// then
 	assert.Len(t, comments, 1)

@@ -28,7 +28,7 @@ func main() {
 }`
 
 	// when
-	comments := detector.Detect(code, "main.go", false)
+	comments := detector.Detect(code, "main.go")
 
 	// then
 	assert.Empty(t, comments)
@@ -42,7 +42,7 @@ def test_something():
     pass`
 
 	// when
-	comments := detector.Detect(code, "test.py", false)
+	comments := detector.Detect(code, "test.py")
 	filtered := applyFilterChain(comments)
 
 	// then
@@ -57,7 +57,7 @@ func Test_FullPipeline_WithRegularComment_ReturnsFormatted(t *testing.T) {
 print("hello")`
 
 	// when
-	comments := detector.Detect(code, "test.py", false)
+	comments := detector.Detect(code, "test.py")
 	filtered := applyFilterChain(comments)
 	message := output.FormatHookMessage(filtered, "")
 
@@ -68,7 +68,7 @@ print("hello")`
 	assert.Contains(t, message, "This is a regular comment")
 }
 
-func Test_FullPipeline_WithDocstring_DetectsAsCodeSmell(t *testing.T) {
+func Test_FullPipeline_WithDocstring_DetectsButFiltersOut(t *testing.T) {
 	// given
 	detector := core.NewCommentDetector()
 	code := `"""This is a docstring"""
@@ -76,12 +76,13 @@ def hello():
     pass`
 
 	// when
-	comments := detector.Detect(code, "test.py", true)
+	comments := detector.Detect(code, "test.py")
 	filtered := applyFilterChain(comments)
 
 	// then
 	assert.NotEmpty(t, comments, "Should detect docstring")
-	assert.NotEmpty(t, filtered, "Docstring should NOT be filtered out (now a code smell)")
+	assert.True(t, comments[0].IsDocstring, "Docstring should be identified")
+	assert.Empty(t, filtered, "Docstring should be filtered out from violations")
 }
 
 func Test_FullPipeline_WithDirective_FiltersOut(t *testing.T) {
@@ -91,7 +92,7 @@ func Test_FullPipeline_WithDirective_FiltersOut(t *testing.T) {
 print("very long line")`
 
 	// when
-	comments := detector.Detect(code, "test.py", false)
+	comments := detector.Detect(code, "test.py")
 	filtered := applyFilterChain(comments)
 
 	// then
@@ -106,7 +107,7 @@ func Test_FullPipeline_WithShebang_FiltersOut(t *testing.T) {
 print("hello")`
 
 	// when
-	comments := detector.Detect(code, "test.py", false)
+	comments := detector.Detect(code, "test.py")
 	filtered := applyFilterChain(comments)
 
 	// then
@@ -261,7 +262,7 @@ func Test_Detect_MultiLanguage_Python_Works(t *testing.T) {
 	code := "# Python comment\nprint('hello')"
 
 	// when
-	comments := detector.Detect(code, "test.py", false)
+	comments := detector.Detect(code, "test.py")
 
 	// then
 	assert.Len(t, comments, 1)
@@ -276,7 +277,7 @@ func Test_Detect_MultiLanguage_Go_Works(t *testing.T) {
 package main`
 
 	// when
-	comments := detector.Detect(code, "main.go", false)
+	comments := detector.Detect(code, "main.go")
 
 	// then
 	assert.Len(t, comments, 1)
@@ -291,7 +292,7 @@ func Test_Detect_MultiLanguage_TypeScript_Works(t *testing.T) {
 const x: number = 1;`
 
 	// when
-	comments := detector.Detect(code, "test.ts", false)
+	comments := detector.Detect(code, "test.ts")
 
 	// then
 	assert.Len(t, comments, 1)
@@ -306,7 +307,7 @@ func Test_Detect_MultiLanguage_JavaScript_Works(t *testing.T) {
 const x = 1;`
 
 	// when
-	comments := detector.Detect(code, "test.js", false)
+	comments := detector.Detect(code, "test.js")
 
 	// then
 	assert.Len(t, comments, 1)
@@ -321,7 +322,7 @@ func Test_Detect_MultiLanguage_Java_Works(t *testing.T) {
 public class Test {}`
 
 	// when
-	comments := detector.Detect(code, "Test.java", false)
+	comments := detector.Detect(code, "Test.java")
 
 	// then
 	assert.Len(t, comments, 1)
@@ -336,7 +337,7 @@ func Test_Detect_MultiLanguage_C_Works(t *testing.T) {
 int main() { return 0; }`
 
 	// when
-	comments := detector.Detect(code, "main.c", false)
+	comments := detector.Detect(code, "main.c")
 
 	// then
 	assert.Len(t, comments, 1)
@@ -351,7 +352,7 @@ func Test_Detect_MultiLanguage_Cpp_Works(t *testing.T) {
 int main() { return 0; }`
 
 	// when
-	comments := detector.Detect(code, "main.cpp", false)
+	comments := detector.Detect(code, "main.cpp")
 
 	// then
 	assert.Len(t, comments, 1)
@@ -366,7 +367,7 @@ func Test_Detect_MultiLanguage_Rust_Works(t *testing.T) {
 fn main() {}`
 
 	// when
-	comments := detector.Detect(code, "main.rs", false)
+	comments := detector.Detect(code, "main.rs")
 
 	// then
 	assert.Len(t, comments, 1)
@@ -381,7 +382,7 @@ func Test_Detect_MultiLanguage_Ruby_Works(t *testing.T) {
 puts "hello"`
 
 	// when
-	comments := detector.Detect(code, "test.rb", false)
+	comments := detector.Detect(code, "test.rb")
 
 	// then
 	assert.Len(t, comments, 1)
@@ -396,7 +397,7 @@ func Test_Detect_MultiLanguage_Bash_Works(t *testing.T) {
 echo "hello"`
 
 	// when
-	comments := detector.Detect(code, "script.sh", false)
+	comments := detector.Detect(code, "script.sh")
 
 	// then
 	assert.Len(t, comments, 1)
@@ -411,7 +412,7 @@ func Test_Detect_MultiLanguage_Kotlin_Works(t *testing.T) {
 fun main() {}`
 
 	// when
-	comments := detector.Detect(code, "Main.kt", false)
+	comments := detector.Detect(code, "Main.kt")
 
 	// then
 	assert.Len(t, comments, 1)
@@ -426,7 +427,7 @@ func Test_Detect_MultiLanguage_Swift_Works(t *testing.T) {
 print("hello")`
 
 	// when
-	comments := detector.Detect(code, "main.swift", false)
+	comments := detector.Detect(code, "main.swift")
 
 	// then
 	assert.Len(t, comments, 1)
@@ -445,7 +446,7 @@ func Test_Detect_BlockComment_JavaScript_Works(t *testing.T) {
 const x = 1;`
 
 	// when
-	comments := detector.Detect(code, "test.js", false)
+	comments := detector.Detect(code, "test.js")
 
 	// then
 	assert.Len(t, comments, 1)
@@ -460,7 +461,7 @@ func Test_Detect_BlockComment_C_Works(t *testing.T) {
 int main() { return 0; }`
 
 	// when
-	comments := detector.Detect(code, "main.c", false)
+	comments := detector.Detect(code, "main.c")
 
 	// then
 	assert.Len(t, comments, 1)
@@ -477,6 +478,7 @@ func applyFilterChain(comments []models.CommentInfo) []models.CommentInfo {
 	directiveFilter := filters.NewDirectiveFilter()
 	shebangFilter := filters.NewShebangFilter()
 	rationaleFilter := filters.NewRationaleFilter()
+	docstringFilter := filters.NewDocstringFilter()
 
 	var filtered []models.CommentInfo
 	for _, c := range comments {
@@ -490,6 +492,9 @@ func applyFilterChain(comments []models.CommentInfo) []models.CommentInfo {
 			continue
 		}
 		if rationaleFilter.ShouldSkip(c) {
+			continue
+		}
+		if docstringFilter.ShouldSkip(c) {
 			continue
 		}
 		filtered = append(filtered, c)
@@ -506,7 +511,7 @@ func Test_FullPipeline_WithAgentMemo_DetectsAsCodeSmell(t *testing.T) {
 print("hello")`
 
 	// when
-	comments := detector.Detect(code, "test.py", false)
+	comments := detector.Detect(code, "test.py")
 	filtered := applyFilterChain(comments)
 
 	// then
@@ -521,7 +526,7 @@ func Test_FullPipeline_WithRationaleComment_FiltersOutBecause(t *testing.T) {
 func main() {}`
 
 	// when
-	comments := detector.Detect(code, "main.go", false)
+	comments := detector.Detect(code, "main.go")
 	filtered := applyFilterChain(comments)
 
 	// then
@@ -536,7 +541,7 @@ func Test_FullPipeline_WithRationaleComment_FiltersOutIssueReference(t *testing.
 func main() {}`
 
 	// when
-	comments := detector.Detect(code, "main.go", false)
+	comments := detector.Detect(code, "main.go")
 	filtered := applyFilterChain(comments)
 
 	// then
@@ -551,7 +556,7 @@ func Test_FullPipeline_WithRationaleComment_FiltersOutImportantConstraint(t *tes
 func main() {}`
 
 	// when
-	comments := detector.Detect(code, "main.go", false)
+	comments := detector.Detect(code, "main.go")
 	filtered := applyFilterChain(comments)
 
 	// then
@@ -566,7 +571,7 @@ func Test_FullPipeline_WithNarrationComment_StillFlaggedIncrement(t *testing.T) 
 func main() {}`
 
 	// when
-	comments := detector.Detect(code, "main.go", false)
+	comments := detector.Detect(code, "main.go")
 	filtered := applyFilterChain(comments)
 
 	// then
@@ -581,7 +586,7 @@ func Test_FullPipeline_WithNarrationComment_StillFlaggedReturn(t *testing.T) {
 func main() {}`
 
 	// when
-	comments := detector.Detect(code, "main.go", false)
+	comments := detector.Detect(code, "main.go")
 	filtered := applyFilterChain(comments)
 
 	// then
@@ -596,7 +601,7 @@ func Test_FullPipeline_WithAgentMemo_FormatterIncludesWarning(t *testing.T) {
 print("hello")`
 
 	// when
-	comments := detector.Detect(code, "test.py", false)
+	comments := detector.Detect(code, "test.py")
 	filtered := applyFilterChain(comments)
 	message := output.FormatHookMessage(filtered, "")
 
@@ -613,7 +618,7 @@ func Test_FullPipeline_WithAgentMemo_Korean_DetectsAsCodeSmell(t *testing.T) {
 print("hello")`
 
 	// when
-	comments := detector.Detect(code, "test.py", false)
+	comments := detector.Detect(code, "test.py")
 	filtered := applyFilterChain(comments)
 
 	// then
@@ -629,7 +634,7 @@ func Test_FullPipeline_RegularComment_NotAgentMemo(t *testing.T) {
 print("hello")`
 
 	// when
-	comments := detector.Detect(code, "test.py", false)
+	comments := detector.Detect(code, "test.py")
 	filtered := applyFilterChain(comments)
 
 	// then
