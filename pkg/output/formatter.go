@@ -59,7 +59,7 @@ func FormatHookMessage(comments []models.CommentInfo, customPrompt string) strin
 	if hasAgentMemo {
 		sb.WriteString("🚨 AGENT MEMO COMMENT DETECTED - CODE SMELL ALERT 🚨\n\n")
 	} else {
-		sb.WriteString("COMMENT/DOCSTRING DETECTED - IMMEDIATE ACTION REQUIRED\n\n")
+		sb.WriteString("⚠️  POTENTIAL LOW-VALUE COMMENT DETECTED ⚠️\n\n")
 	}
 
 	// Agent memo warning (if detected)
@@ -91,9 +91,9 @@ func FormatHookMessage(comments []models.CommentInfo, customPrompt string) strin
 	}
 
 	// Guidelines
-	sb.WriteString("Your recent changes contain comments or docstrings, which triggered this hook.\n")
-	sb.WriteString("You need to take immediate action. You must follow the conditions below.\n")
-	sb.WriteString("(Listed in priority order - you must always act according to this priority order)\n\n")
+	sb.WriteString("Your recent changes contain comments that may be redundant or low-value, triggering this hook.\n")
+	sb.WriteString("While useful documentation is encouraged, redundant narration and memo comments should be avoided.\n")
+	sb.WriteString("Please review the detected comments and take action according to the priority guidelines below:\n\n")
 
 	sb.WriteString("CRITICAL WARNING: This hook message MUST NEVER be ignored, even if you receive it multiple times.\n")
 	sb.WriteString("You MUST provide corresponding explanation or action for EACH occurrence of this message.\n")
@@ -108,16 +108,14 @@ func FormatHookMessage(comments []models.CommentInfo, customPrompt string) strin
 	sb.WriteString("\t-> Tell the user it's a BDD comment and proceed (justify it)\n")
 	sb.WriteString("\t-> Note: This applies to comments only, not docstrings\n\n")
 
-	sb.WriteString("3. This is a newly written comment/docstring: but it's a necessary comment/docstring\n")
-	sb.WriteString("\t-> Tell the user why this comment/docstring is absolutely necessary and proceed (justify it)\n")
-	sb.WriteString("\t-> Examples of necessary comments: complex algorithms, security-related, performance optimization, regex, mathematical formulas\n")
-	sb.WriteString("\t-> Examples of necessary docstrings: public API documentation, complex module/class interfaces\n")
-	sb.WriteString("\t-> IMPORTANT: Most docstrings are unnecessary if the code is self-explanatory. Only keep truly essential ones.\n\n")
+	sb.WriteString("3. This is a newly written docstring for a public API or declaration\n")
+	sb.WriteString("\t-> Docstrings are EXPECTED for public APIs/declarations and do NOT trigger violations by default.\n")
+	sb.WriteString("\t-> If you see this, ensure the docstring provides meaningful context beyond the function name.\n\n")
 
-	sb.WriteString("4. This is a newly written comment/docstring: but it's an unnecessary comment/docstring\n")
+	sb.WriteString("4. This is a newly written comment/docstring: redundant narration or memo\n")
 	sb.WriteString("\t-> Apologize to the user and remove the comment/docstring.\n")
 	sb.WriteString("\t-> Make the code itself clearer so it can be understood without comments/docstrings.\n")
-	sb.WriteString("\t-> For verbose docstrings: refactor code to be self-documenting instead of adding lengthy explanations.\n\n")
+	sb.WriteString("\t-> Examples of redundant narration: // increment i, // return result, // calling function X\n\n")
 
 	sb.WriteString("MANDATORY REQUIREMENT: You must acknowledge this hook message and take one of the above actions.\n")
 	sb.WriteString("Review in the above priority order and take the corresponding action EVERY TIME this appears.\n\n")

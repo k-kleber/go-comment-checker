@@ -63,7 +63,7 @@ print("hello")`
 
 	// then
 	assert.Len(t, filtered, 1)
-	assert.Contains(t, message, "COMMENT/DOCSTRING DETECTED")
+	assert.Contains(t, message, "POTENTIAL LOW-VALUE COMMENT DETECTED")
 	assert.Contains(t, message, "test.py")
 	assert.Contains(t, message, "This is a regular comment")
 }

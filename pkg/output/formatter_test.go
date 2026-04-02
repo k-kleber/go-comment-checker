@@ -23,7 +23,7 @@ func Test_FormatHookMessage_SingleComment_ReturnsFormattedMessage(t *testing.T) 
 	result := FormatHookMessage(comments, "")
 
 	// then
-	assert.Contains(t, result, "COMMENT/DOCSTRING DETECTED - IMMEDIATE ACTION REQUIRED")
+	assert.Contains(t, result, "⚠️  POTENTIAL LOW-VALUE COMMENT DETECTED ⚠️")
 	assert.Contains(t, result, `<comments file="src/app.py">`)
 	assert.Contains(t, result, `<comment line-number="10"># TODO: fix this</comment>`)
 	assert.Contains(t, result, "</comments>")
@@ -113,7 +113,7 @@ func Test_FormatHookMessage_DocstringComment_ReturnsFormattedMessage(t *testing.
 	result := FormatHookMessage(comments, "")
 
 	// then
-	assert.Contains(t, result, "COMMENT/DOCSTRING DETECTED - IMMEDIATE ACTION REQUIRED")
+	assert.Contains(t, result, "⚠️  POTENTIAL LOW-VALUE COMMENT DETECTED ⚠️")
 	assert.Contains(t, result, `<comments file="src/utils.py">`)
 	assert.Contains(t, result, `<comment line-number="1">"""Module docstring."""</comment>`)
 	assert.Contains(t, result, "MANDATORY REQUIREMENT:")
@@ -157,7 +157,7 @@ func Test_FormatHookMessage_CustomPrompt_ReplacesDefaultMessage(t *testing.T) {
 	assert.Contains(t, result, `<comments file="src/app.py">`)
 	assert.Contains(t, result, `<comment line-number="10"># Test comment</comment>`)
 	assert.Contains(t, result, "Please fix.")
-	assert.NotContains(t, result, "COMMENT/DOCSTRING DETECTED - IMMEDIATE ACTION REQUIRED")
+	assert.NotContains(t, result, "⚠️  POTENTIAL LOW-VALUE COMMENT DETECTED ⚠️")
 }
 
 func Test_FormatHookMessage_CustomPrompt_WithoutPlaceholder_ReturnsCustomOnly(t *testing.T) {

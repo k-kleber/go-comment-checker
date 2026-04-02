@@ -1,0 +1,25 @@
+Task 4: CLI Contract and Policy Messaging Verification
+======================================================
+
+1. Exit Code Contract (Verified via tests/integration_test.go):
+   - Exit 0 for no violations (Pass)
+   - Exit 2 for violations (Block)
+   - Legacy --include-docstrings flag preserved
+
+2. Formatter Messaging Updated (pkg/output/formatter.go):
+   - Header: '⚠️  POTENTIAL LOW-VALUE COMMENT DETECTED ⚠️'
+   - Priority 3: Docstrings on public APIs/declarations expected
+   - Priority 4: Redundant narration/memo flagged
+   - Placeholder {{comments}} and --prompt flag compatibility preserved
+
+3. Regression Suite (tests/integration_test.go):
+   - Pass: Clean code
+   - Pass: Docstrings (filtered out)
+   - Pass: Rationale comments (filtered out)
+   - Pass: BDD/Directive/Shebang (filtered out)
+   - Block: Redundant narration comments (e.g., // increment i)
+   - Block: Agent memo comments (e.g., # Modified to...)
+
+4. Test Results:
+   - 114 tests passed
+   - ALL packages passed successfully
