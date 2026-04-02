@@ -1,0 +1,7 @@
+?   	github.com/k-kleber/go-comment-checker/cmd/comment-checker	[no test files]
+ok  	github.com/k-kleber/go-comment-checker/pkg/core	0.019s
+ok  	github.com/k-kleber/go-comment-checker/pkg/filters	(cached)
+ok  	github.com/k-kleber/go-comment-checker/pkg/input	(cached)
+ok  	github.com/k-kleber/go-comment-checker/pkg/models	(cached)
+ok  	github.com/k-kleber/go-comment-checker/pkg/output	(cached)
+ok  	github.com/k-kleber/go-comment-checker/tests	0.245s

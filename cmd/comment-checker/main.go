@@ -44,6 +44,7 @@ const (
 )
 
 var customPrompt string
+var includeDocstrings bool
 
 func main() {
 	rootCmd := &cobra.Command{
@@ -54,6 +55,7 @@ func main() {
 	}
 
 	rootCmd.Flags().StringVar(&customPrompt, "prompt", "", "Custom prompt to replace the default warning message. Use {{comments}} placeholder for detected comments XML.")
+	rootCmd.Flags().BoolVar(&includeDocstrings, "include-docstrings", false, "Include docstrings as violations (legacy behavior)")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, "[check-comments] Skipping: Command execution failed")
@@ -163,7 +165,7 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	// Apply filter chain: BDD -> Directive -> Shebang
-	filtered := applyFilters(comments)
+	filtered := applyFilters(comments, includeDocstrings)
 
 	// No problematic comments after filtering
 	if len(filtered) == 0 {
@@ -204,7 +206,7 @@ func getContentToCheck(input HookInput) string {
 }
 
 // applyFilters applies all filters in order and returns remaining comments.
-func applyFilters(comments []models.CommentInfo) []models.CommentInfo {
+func applyFilters(comments []models.CommentInfo, includeDocstrings bool) []models.CommentInfo {
 	_ = "MVR-checked: comments"
 	bddFilter := filters.NewBDDFilter()
 	directiveFilter := filters.NewDirectiveFilter()
@@ -226,7 +228,7 @@ func applyFilters(comments []models.CommentInfo) []models.CommentInfo {
 		if rationaleFilter.ShouldSkip(c) {
 			continue
 		}
-		if docstringFilter.ShouldSkip(c) {
+		if !includeDocstrings && docstringFilter.ShouldSkip(c) {
 			continue
 		}
 		filtered = append(filtered, c)

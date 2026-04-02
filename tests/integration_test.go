@@ -68,7 +68,7 @@ print("hello")`
 	assert.Contains(t, message, "This is a regular comment")
 }
 
-func Test_FullPipeline_WithDocstring_DetectsButFiltersOut(t *testing.T) {
+func Test_FullPipeline_WithPythonDocstring_DetectsButFiltersOut(t *testing.T) {
 	// given
 	detector := core.NewCommentDetector()
 	code := `"""This is a docstring"""
@@ -83,6 +83,48 @@ def hello():
 	assert.NotEmpty(t, comments, "Should detect docstring")
 	assert.True(t, comments[0].IsDocstring, "Docstring should be identified")
 	assert.Empty(t, filtered, "Docstring should be filtered out from violations")
+}
+
+func Test_FullPipeline_WithTypeScriptDeclarationDocstring_DetectsButFiltersOut(t *testing.T) {
+	// given
+	detector := core.NewCommentDetector()
+	code := `/**
+ * Adds two numbers.
+ */
+function add(a: number, b: number): number {
+	return a + b;
+}`
+
+	// when
+	comments := detector.Detect(code, "test.ts")
+	filtered := applyFilterChain(comments)
+
+	// then
+	assert.NotEmpty(t, comments, "Should detect declaration docstring")
+	assert.True(t, comments[0].IsDocstring, "Declaration docstring should be identified")
+	assert.Equal(t, models.CommentTypeDocstring, comments[0].CommentType)
+	assert.Empty(t, filtered, "TypeScript declaration docstring should not be a violation")
+}
+
+func Test_FullPipeline_WithJavaScriptDeclarationDocstring_DetectsButFiltersOut(t *testing.T) {
+	// given
+	detector := core.NewCommentDetector()
+	code := `/**
+ * Formats a label for display.
+ */
+function formatLabel(label) {
+	return label.trim();
+}`
+
+	// when
+	comments := detector.Detect(code, "test.js")
+	filtered := applyFilterChain(comments)
+
+	// then
+	assert.NotEmpty(t, comments, "Should detect declaration docstring")
+	assert.True(t, comments[0].IsDocstring, "Declaration docstring should be identified")
+	assert.Equal(t, models.CommentTypeDocstring, comments[0].CommentType)
+	assert.Empty(t, filtered, "JavaScript declaration docstring should not be a violation")
 }
 
 func Test_FullPipeline_WithDirective_FiltersOut(t *testing.T) {

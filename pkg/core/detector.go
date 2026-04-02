@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	sitter "github.com/smacker/go-tree-sitter"
@@ -91,9 +92,39 @@ func (d *CommentDetector) Detect(content, filePath string) []models.CommentInfo 
 	}
 
 	docstrings := d.detectDocstrings(sourceCode, filePath, lang, langName)
-	comments = append(comments, docstrings...)
+	comments = d.classifyDocstrings(comments, docstrings)
 
 	return comments
+}
+
+func (d *CommentDetector) classifyDocstrings(comments, docstrings []models.CommentInfo) []models.CommentInfo {
+	if len(docstrings) == 0 {
+		return comments
+	}
+
+	docstringByKey := make(map[string]models.CommentInfo, len(docstrings))
+	for _, doc := range docstrings {
+		docstringByKey[commentIdentityKey(doc)] = doc
+	}
+
+	for i := range comments {
+		key := commentIdentityKey(comments[i])
+		if _, ok := docstringByKey[key]; ok {
+			comments[i].CommentType = models.CommentTypeDocstring
+			comments[i].IsDocstring = true
+			delete(docstringByKey, key)
+		}
+	}
+
+	for _, doc := range docstringByKey {
+		comments = append(comments, doc)
+	}
+
+	return comments
+}
+
+func commentIdentityKey(comment models.CommentInfo) string {
+	return strings.TrimSpace(comment.Text) + "|" + strconv.Itoa(comment.LineNumber)
 }
 
 // detectDocstrings extracts docstrings using language-specific queries.
@@ -132,7 +163,7 @@ func (d *CommentDetector) detectDocstrings(sourceCode []byte, filePath string, l
 		for _, capture := range match.Captures {
 			node := capture.Node
 			text := node.Content(sourceCode)
-			if !d.matchesDocstringPolicy(text, langName) {
+			if !d.matchesDocstringPolicy(text, langName, sourceCode, node.EndByte()) {
 				continue
 			}
 			lineNumber := int(node.StartPoint().Row) + 1
@@ -150,8 +181,8 @@ func (d *CommentDetector) detectDocstrings(sourceCode []byte, filePath string, l
 	return docstrings
 }
 
-func (d *CommentDetector) matchesDocstringPolicy(text, langName string) bool {
-	_ = "MVR-checked: text,langName"
+func (d *CommentDetector) matchesDocstringPolicy(text, langName string, sourceCode []byte, nodeEndByte uint32) bool {
+	_ = "MVR-checked: text,langName,sourceCode,nodeEndByte"
 	stripped := strings.TrimSpace(text)
 
 	if stripped == "" {
@@ -160,10 +191,73 @@ func (d *CommentDetector) matchesDocstringPolicy(text, langName string) bool {
 
 	switch langName {
 	case "javascript", "typescript", "tsx", "java":
-		return strings.HasPrefix(stripped, "/**")
+		if !strings.HasPrefix(stripped, "/**") {
+			return false
+		}
+		return d.hasDeclarationAfter(sourceCode, nodeEndByte, langName)
 	default:
 		return true
 	}
+}
+
+func (d *CommentDetector) hasDeclarationAfter(sourceCode []byte, nodeEndByte uint32, langName string) bool {
+	if int(nodeEndByte) >= len(sourceCode) {
+		return false
+	}
+
+	remainder := strings.TrimSpace(string(sourceCode[nodeEndByte:]))
+	if remainder == "" {
+		return false
+	}
+
+	firstLine := remainder
+	if idx := strings.IndexByte(firstLine, '\n'); idx >= 0 {
+		firstLine = firstLine[:idx]
+	}
+	firstLine = strings.TrimSpace(firstLine)
+	if firstLine == "" {
+		return false
+	}
+
+	if langName == "java" {
+		return strings.HasPrefix(firstLine, "public ") ||
+			strings.HasPrefix(firstLine, "private ") ||
+			strings.HasPrefix(firstLine, "protected ") ||
+			strings.HasPrefix(firstLine, "static ") ||
+			strings.HasPrefix(firstLine, "final ") ||
+			strings.HasPrefix(firstLine, "abstract ") ||
+			strings.HasPrefix(firstLine, "class ") ||
+			strings.HasPrefix(firstLine, "interface ") ||
+			strings.HasPrefix(firstLine, "enum ") ||
+			strings.HasPrefix(firstLine, "@")
+	}
+
+	if strings.HasPrefix(firstLine, "export ") ||
+		strings.HasPrefix(firstLine, "default ") ||
+		strings.HasPrefix(firstLine, "async function ") ||
+		strings.HasPrefix(firstLine, "function ") ||
+		strings.HasPrefix(firstLine, "class ") ||
+		strings.HasPrefix(firstLine, "interface ") ||
+		strings.HasPrefix(firstLine, "type ") ||
+		strings.HasPrefix(firstLine, "const ") ||
+		strings.HasPrefix(firstLine, "let ") ||
+		strings.HasPrefix(firstLine, "var ") ||
+		strings.HasPrefix(firstLine, "declare ") ||
+		strings.HasPrefix(firstLine, "public ") ||
+		strings.HasPrefix(firstLine, "private ") ||
+		strings.HasPrefix(firstLine, "protected ") ||
+		strings.HasPrefix(firstLine, "readonly ") ||
+		strings.HasPrefix(firstLine, "abstract ") {
+		return true
+	}
+
+	openParen := strings.IndexByte(firstLine, '(')
+	closeParen := strings.IndexByte(firstLine, ')')
+	if openParen > 0 && closeParen > openParen && strings.Contains(firstLine[closeParen:], "{") {
+		return true
+	}
+
+	return false
 }
 
 // determineCommentType determines the type of comment based on its text and node type.
