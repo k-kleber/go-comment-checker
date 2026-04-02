@@ -3,7 +3,7 @@ package filters
 import (
 	"testing"
 
-	"github.com/code-yeongyu/go-claude-code-comment-checker/pkg/models"
+	"github.com/k-kleber/go-comment-checker/pkg/models"
 	"github.com/stretchr/testify/assert"
 )
 

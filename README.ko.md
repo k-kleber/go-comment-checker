@@ -29,12 +29,12 @@ brew install comment-checker
 ### Go Install
 
 ```sh
-go install github.com/code-yeongyu/go-claude-code-comment-checker/cmd/comment-checker@latest
+go install github.com/k-kleber/go-comment-checker/cmd/comment-checker@latest
 ```
 
 ### 바이너리 직접 다운로드
 
-[Releases](https://github.com/code-yeongyu/go-claude-code-comment-checker/releases) 페이지에서 플랫폼에 맞는 바이너리를 받아 PATH에 추가하세요.
+[Releases](https://github.com/k-kleber/go-comment-checker/releases) 페이지에서 플랫폼에 맞는 바이너리를 받아 PATH에 추가하세요.
 
 ---
 

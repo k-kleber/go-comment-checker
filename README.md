@@ -31,12 +31,12 @@ brew install comment-checker
 ### go install
 
 ```bash
-go install github.com/code-yeongyu/go-claude-code-comment-checker/cmd/comment-checker@latest
+go install github.com/k-kleber/go-comment-checker/cmd/comment-checker@latest
 ```
 
 ### manual
 
-grab binary from [releases](https://github.com/code-yeongyu/go-claude-code-comment-checker/releases).
+grab binary from [releases](https://github.com/k-kleber/go-comment-checker/releases).
 
 ## setup
 

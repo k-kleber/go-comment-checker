@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/code-yeongyu/go-claude-code-comment-checker/pkg/models"
+	"github.com/k-kleber/go-comment-checker/pkg/models"
 )
 
 // BuildCommentsXML builds <comments> XML block for a given file and its comments.

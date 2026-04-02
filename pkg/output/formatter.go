@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/code-yeongyu/go-claude-code-comment-checker/pkg/filters"
-	"github.com/code-yeongyu/go-claude-code-comment-checker/pkg/models"
+	"github.com/k-kleber/go-comment-checker/pkg/filters"
+	"github.com/k-kleber/go-comment-checker/pkg/models"
 )
 
 // FormatHookMessage formats comment detection results for Claude Code hooks.

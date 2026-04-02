@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/code-yeongyu/go-claude-code-comment-checker/pkg/models"
+	"github.com/k-kleber/go-comment-checker/pkg/models"
 )
 
 func Test_Detect_PythonLineComment_ReturnsCommentInfo(t *testing.T) {

@@ -6,10 +6,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/code-yeongyu/go-claude-code-comment-checker/pkg/core"
-	"github.com/code-yeongyu/go-claude-code-comment-checker/pkg/filters"
-	"github.com/code-yeongyu/go-claude-code-comment-checker/pkg/models"
-	"github.com/code-yeongyu/go-claude-code-comment-checker/pkg/output"
+	"github.com/k-kleber/go-comment-checker/pkg/core"
+	"github.com/k-kleber/go-comment-checker/pkg/filters"
+	"github.com/k-kleber/go-comment-checker/pkg/models"
+	"github.com/k-kleber/go-comment-checker/pkg/output"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

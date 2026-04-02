@@ -3,7 +3,7 @@ package filters
 import (
 	"strings"
 
-	"github.com/code-yeongyu/go-claude-code-comment-checker/pkg/models"
+	"github.com/k-kleber/go-comment-checker/pkg/models"
 )
 
 // TypeCheckerPrefixes contains type checker and linter directive prefixes that should be skipped.

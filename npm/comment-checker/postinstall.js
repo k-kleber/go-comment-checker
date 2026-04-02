@@ -6,7 +6,7 @@ const { execSync } = require("child_process");
 const https = require("https");
 const http = require("http");
 
-const REPO = "code-yeongyu/go-claude-code-comment-checker";
+const REPO = "k-kleber/go-comment-checker";
 
 const PLATFORM_MAP = {
   "darwin-arm64": { os: "darwin", arch: "arm64", ext: "tar.gz" },
